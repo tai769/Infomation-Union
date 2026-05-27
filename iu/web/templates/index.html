@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Information Union{% endblock %}
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <div class="number">{{ total }}</div>
+        <div class="label">Total Items</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ persons|length }}</div>
+        <div class="label">Tracked Persons</div>
+    </div>
+    {% if report %}
+    <div class="stat-card">
+        <div class="number">{{ report.item_ids|length if report.item_ids else 0 }}</div>
+        <div class="label">This Week</div>
+    </div>
+    {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 300px; gap: 24px;">
+    <div>
+        <h2 style="font-size: 18px; margin-bottom: 16px;">Latest Items</h2>
+        {% for item in items %}
+        <div class="card">
+            <h3>
+                <span class="badge badge-{{ item.source }}">{{ item.source }}</span>
+                <a href="{{ item.source_url }}" target="_blank">{{ item.title or '(no title)' }}</a>
+            </h3>
+            <p>{{ (item.content or '')[:200] }}{% if (item.content or '')|length > 200 %}...{% endif %}</p>
+            <div class="meta">
+                <span>{{ item.author or 'Unknown' }}</span>
+                <span>{{ item.published_at[:10] if item.published_at else '' }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        <a href="/items" style="display: inline-block; margin-top: 8px;">View all items →</a>
+    </div>
+
+    <div>
+        <h2 style="font-size: 18px; margin-bottom: 16px;">Top Persons</h2>
+        {% for p in persons[:10] %}
+        <div class="card" style="padding: 12px;">
+            <a href="/persons/{{ p.id }}">{{ p.name }}</a>
+            <span style="float: right; color: #999; font-size: 13px;">{{ p.count }} items</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

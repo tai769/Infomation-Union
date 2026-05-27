@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name if product else 'Product' }} — Information Union{% endblock %}
+{% block content %}
+{% if product %}
+<h2 style="font-size: 18px; margin-bottom: 8px;">{{ product.name }}</h2>
+<div class="meta" style="margin-bottom: 20px;">
+    <span>{{ product.company or '' }}</span>
+    <span>{{ items|length }} items</span>
+</div>
+
+{% for item in items %}
+<div class="card">
+    <h3>
+        <span class="badge badge-{{ item.source }}">{{ item.source }}</span>
+        <a href="{{ item.source_url }}" target="_blank">{{ item.title or '(no title)' }}</a>
+    </h3>
+    <p>{{ (item.content or '')[:300] }}{% if (item.content or '')|length > 300 %}...{% endif %}</p>
+    <div class="meta">
+        <span>{{ item.author or '' }}</span>
+        <span>{{ item.published_at[:10] if item.published_at else '' }}</span>
+    </div>
+</div>
+{% else %}
+<p style="color: #999;">No items found for this product.</p>
+{% endfor %}
+{% else %}
+<p>Product not found.</p>
+{% endif %}
+{% endblock %}

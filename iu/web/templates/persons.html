@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Persons — Information Union{% endblock %}
+{% block content %}
+<h2 style="font-size: 18px; margin-bottom: 16px;">Tracked Persons</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+    {% for p in persons %}
+    <div class="card">
+        <h3><a href="/persons/{{ p.id }}">{{ p.name }}</a></h3>
+        <div class="meta">
+            <span>{{ p.count }} items</span>
+            {% if p.twitter %}
+            <a href="https://x.com/{{ p.twitter }}" target="_blank">@{{ p.twitter }}</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,190 @@
+# Information Union Configuration
+# Copy to config.yaml and customize
+
+# --- Persons to track ---
+persons:
+  - id: karpathy
+    name: Andrej Karpathy
+    twitter: karpathy
+    youtube_channel: UCXUPKJO5MZQN11PqgIvyuvQ
+    tags: [ai-researcher, tesla, openai]
+
+  - id: sam-altman
+    name: Sam Altman
+    twitter: sama
+    tags: [openai, ceo]
+
+  - id: dario-amodei
+    name: Dario Amodei
+    twitter: DarioAmodei
+    tags: [anthropic, ceo, safety]
+
+  - id: jensen-huang
+    name: Jensen Huang
+    twitter: nvidia
+    tags: [nvidia, hardware, ceo]
+
+  - id: ilya-sutskever
+    name: Ilya Sutskever
+    twitter: ilyasut
+    tags: [ssi, safety, openai]
+
+  - id: logan-kilpatrick
+    name: Logan Kilpatrick
+    twitter: OfficialLoganK
+    tags: [google, ai-studio]
+
+  - id: harrison-chase
+    name: Harrison Chase
+    twitter: hwchase17
+    tags: [langchain, agent]
+
+  - id: guillermo-rauch
+    name: Guillermo Rauch
+    twitter: raaboratory
+    tags: [vercel, v0, frontend]
+
+  - id: amjad-masad
+    name: Amjad Masad
+    twitter: amasad
+    tags: [replit, coding-agent]
+
+  - id: theo-browne
+    name: Theo Browne
+    twitter: t3dotgg
+    tags: [t3, tech-commentary]
+
+  - id: lex-fridman
+    name: Lex Fridman
+    twitter: lexfridman
+    youtube_channel: UCSHZKJJfhK61IS3o3Q1GhZg
+    tags: [podcast, interviews]
+
+  - id: ben-thompson
+    name: Ben Thompson
+    twitter: benthompson
+    tags: [stratechery, analysis]
+
+  - id: matt-wolfe
+    name: Matt Wolfe
+    twitter: maboreinw
+    youtube_channel: UCj_bMKA2c0LoO5MILjFgL9g
+    tags: [ai-tools, youtube]
+
+  - id: ai-jason
+    name: AI Jason
+    twitter: aiaboratoryJason
+    tags: [ai-agent, tools]
+
+# --- Products to track ---
+products:
+  - id: claude-code
+    name: Claude Code
+    company: Anthropic
+    tags: [coding-agent, ide]
+
+  - id: codex
+    name: Codex
+    company: OpenAI
+    tags: [coding-agent]
+
+  - id: cursor
+    name: Cursor
+    company: Anysphere
+    tags: [ide, coding-agent]
+
+  - id: copilot
+    name: GitHub Copilot
+    company: Microsoft
+    tags: [coding-agent]
+
+  - id: langchain
+    name: LangChain
+    company: LangChain
+    tags: [agent-framework]
+
+  - id: crewai
+    name: CrewAI
+    company: CrewAI
+    tags: [agent-framework]
+
+  - id: autogen
+    name: AutoGen
+    company: Microsoft
+    tags: [agent-framework]
+
+  - id: chatgpt
+    name: ChatGPT
+    company: OpenAI
+    tags: [llm, chat]
+
+  - id: claude
+    name: Claude
+    company: Anthropic
+    tags: [llm, chat]
+
+  - id: gemini
+    name: Gemini
+    company: Google
+    tags: [llm, chat]
+
+  - id: nvidia
+    name: NVIDIA
+    company: NVIDIA
+    tags: [hardware, gpu, infrastructure]
+
+# --- Source configs ---
+twitter:
+  enabled: true
+  nitter_instances:
+    - https://nitter.privacydev.net
+    - https://nitter.poast.org
+
+youtube:
+  enabled: true
+  api_key: ""         # Optional: YouTube Data API v3 key
+
+reddit:
+  enabled: true
+  subreddits:
+    - MachineLearning
+    - artificial
+    - LocalLLaMA
+    - ChatGPT
+    - ClaudeAI
+
+rss:
+  enabled: true
+  feeds:
+    - url: https://openai.com/blog/rss.xml
+      name: OpenAI Blog
+    - url: https://www.anthropic.com/feed.xml
+      name: Anthropic Blog
+    - url: https://hnrss.org/newest?q=AI+agent
+      name: Hacker News AI
+
+news:
+  enabled: true
+  newsapi_key: ""     # Optional: newsapi.org key
+
+# --- Analysis (Claude API) ---
+analysis:
+  anthropic_api_key: ""   # Your Anthropic API key for auto-analysis
+  model: "claude-sonnet-4-20250514"
+  max_tokens: 4096
+  batch_size: 20
+
+# --- Email ---
+email:
+  enabled: false
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  smtp_user: ""
+  smtp_password: ""       # App password for Gmail
+  from_addr: ""
+  to_addrs: []
+
+# --- Web UI ---
+web:
+  host: "0.0.0.0"
+  port: 8080

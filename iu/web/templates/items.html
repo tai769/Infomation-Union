@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Items — Information Union{% endblock %}
+{% block content %}
+<h2 style="font-size: 18px; margin-bottom: 16px;">All Items</h2>
+
+<form class="filter-bar" method="get" action="/items">
+    <select name="person" onchange="this.form.submit()">
+        <option value="">All Persons</option>
+        {% for p in persons %}
+        <option value="{{ p.id }}" {% if p.id == current_person %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="product" onchange="this.form.submit()">
+        <option value="">All Products</option>
+        {% for p in products %}
+        <option value="{{ p.id }}" {% if p.id == current_product %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="source" onchange="this.form.submit()">
+        <option value="">All Sources</option>
+        <option value="twitter" {% if current_source == 'twitter' %}selected{% endif %}>Twitter</option>
+        <option value="youtube" {% if current_source == 'youtube' %}selected{% endif %}>YouTube</option>
+        <option value="reddit" {% if current_source == 'reddit' %}selected{% endif %}>Reddit</option>
+        <option value="rss" {% if current_source == 'rss' %}selected{% endif %}>RSS</option>
+        <option value="news" {% if current_source == 'news' %}selected{% endif %}>News</option>
+    </select>
+    <input type="text" name="q" placeholder="Search..." value="{{ query }}" />
+    <button type="submit">Search</button>
+</form>
+
+<div id="item-list">
+    {% for item in items %}
+    <div class="card">
+        <h3>
+            <span class="badge badge-{{ item.source }}">{{ item.source }}</span>
+            <a href="{{ item.source_url }}" target="_blank">{{ item.title or '(no title)' }}</a>
+        </h3>
+        <p>{{ (item.content or '')[:300] }}{% if (item.content or '')|length > 300 %}...{% endif %}</p>
+        <div class="meta">
+            <span>{{ item.author or 'Unknown' }}</span>
+            <span>{{ item.published_at[:10] if item.published_at else '' }}</span>
+            {% if item.metadata and item.metadata.subreddit %}
+            <span>r/{{ item.metadata.subreddit }}</span>
+            {% endif %}
+            {% if item.metadata and item.metadata.score %}
+            <span>Score: {{ item.metadata.score }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p style="color: #999; padding: 20px;">No items found. Run <code>iu collect</code> to gather data.</p>
+    {% endfor %}
+</div>
+
+{% if items|length >= 30 %}
+<div style="text-align: center; margin-top: 16px;">
+    <a href="/items?page={{ page + 1 }}&person={{ current_person }}&product={{ current_product }}&source={{ current_source }}&q={{ query }}">Load more →</a>
+</div>
+{% endif %}
+{% endblock %}

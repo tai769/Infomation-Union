@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Information Union{% endblock %}</title>
+    <script src="/static/htmx.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        nav { background: #1a1a2e; color: white; padding: 16px 0; }
+        nav .container { display: flex; align-items: center; gap: 24px; }
+        nav a { color: #a0a0c0; text-decoration: none; font-size: 14px; }
+        nav a:hover, nav a.active { color: white; }
+        nav h1 { font-size: 18px; font-weight: 600; }
+        .content { padding: 24px 0; }
+        .card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .card h3 { font-size: 15px; margin-bottom: 8px; }
+        .card p { font-size: 13px; color: #666; line-height: 1.5; }
+        .meta { font-size: 12px; color: #999; margin-top: 8px; display: flex; gap: 12px; align-items: center; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+        .badge-twitter { background: #e8f5fe; color: #1da1f2; }
+        .badge-youtube { background: #fce8e6; color: #ff0000; }
+        .badge-reddit { background: #fff3e0; color: #ff5722; }
+        .badge-rss { background: #e8f5e9; color: #4caf50; }
+        .badge-news { background: #f3e5f5; color: #9c27b0; }
+        .mention-tag { display: inline-block; background: #e3f2fd; color: #1565c0; padding: 1px 6px; border-radius: 3px; font-size: 11px; margin-right: 4px; text-decoration: none; }
+        .mention-tag:hover { background: #bbdefb; }
+        .filter-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .stat-card .number { font-size: 32px; font-weight: 700; color: #1a1a2e; }
+        .stat-card .label { font-size: 13px; color: #999; margin-top: 4px; }
+        a { color: #1565c0; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>IU</h1>
+            <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Dashboard</a>
+            <a href="/items" class="{% if request.url.path == '/items' %}active{% endif %}">Items</a>
+            <a href="/persons" class="{% if request.url.path == '/persons' %}active{% endif %}">Persons</a>
+            <a href="/products" class="{% if request.url.path == '/products' %}active{% endif %}">Products</a>
+        </div>
+    </nav>
+    <div class="container content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
