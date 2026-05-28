@@ -174,9 +174,13 @@ def get_item_count(conn: sqlite3.Connection) -> int:
 
 def get_person_item_counts(conn: sqlite3.Connection) -> list[dict]:
     rows = conn.execute("""
-        SELECT p.id, p.name, COUNT(i.id) as count
-        FROM persons p LEFT JOIN items i ON p.id = i.person_id
+        SELECT p.id, p.name, (
+            SELECT COUNT(DISTINCT i.id) FROM items i
+            WHERE i.person_id = p.id
+               OR i.id IN (SELECT m.item_id FROM item_mentions m WHERE m.entity_type = 'person' AND m.entity_id = p.id)
+        ) as count
+        FROM persons p
         WHERE p.active = 1
-        GROUP BY p.id ORDER BY count DESC
+        ORDER BY count DESC
     """).fetchall()
     return [dict(r) for r in rows]
