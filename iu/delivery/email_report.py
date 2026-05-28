@@ -126,10 +126,17 @@ async def send_report(conn: sqlite3.Connection, config: AppConfig) -> None:
     msg.attach(MIMEText(html, "html"))
 
     try:
-        with smtplib.SMTP(config.email.smtp_host, config.email.smtp_port) as server:
-            server.starttls()
-            server.login(config.email.smtp_user, config.email.smtp_password)
-            server.send_message(msg)
+        if config.email.smtp_port == 465:
+            # SSL (163, QQ, etc.)
+            with smtplib.SMTP_SSL(config.email.smtp_host, config.email.smtp_port) as server:
+                server.login(config.email.smtp_user, config.email.smtp_password)
+                server.send_message(msg)
+        else:
+            # STARTTLS (Gmail 587, etc.)
+            with smtplib.SMTP(config.email.smtp_host, config.email.smtp_port) as server:
+                server.starttls()
+                server.login(config.email.smtp_user, config.email.smtp_password)
+                server.send_message(msg)
         logger.info(f"Email sent to {config.email.to_addrs}")
     except Exception as e:
         logger.error(f"Failed to send email: {e}")
