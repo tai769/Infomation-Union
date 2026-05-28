@@ -31,10 +31,10 @@ def compute_hash(source: str, source_url: str) -> str:
 
 def insert_person(conn: sqlite3.Connection, person_id: str, name: str,
                   twitter: str = "", youtube: str = "", reddit: str = "",
-                  tags: list[str] | None = None) -> None:
+                  github: str = "", tags: list[str] | None = None) -> None:
     conn.execute(
-        "INSERT OR REPLACE INTO persons (id, name, twitter, youtube, reddit, tags) VALUES (?,?,?,?,?,?)",
-        (person_id, name, twitter, youtube, reddit, json.dumps(tags or []))
+        "INSERT OR REPLACE INTO persons (id, name, twitter, youtube, reddit, github, tags) VALUES (?,?,?,?,?,?,?)",
+        (person_id, name, twitter, youtube, reddit, github, json.dumps(tags or []))
     )
     conn.commit()
 

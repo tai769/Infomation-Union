@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS persons (
     twitter     TEXT,
     youtube     TEXT,
     reddit      TEXT,
+    github      TEXT,
     tags        TEXT DEFAULT '[]',   -- JSON array
     active      INTEGER DEFAULT 1
 );

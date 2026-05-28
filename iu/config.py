@@ -15,6 +15,7 @@ class PersonConfig(BaseModel):
     twitter: str = ""
     youtube_channel: str = ""
     reddit: str = ""
+    github: str = ""
     tags: list[str] = Field(default_factory=list)
 
 
@@ -91,6 +92,11 @@ class WebConfig(BaseModel):
     port: int = 8080
 
 
+class GitHubConfig(BaseModel):
+    enabled: bool = True
+    token: str = ""  # Optional: increases rate limit from 60 to 5000 req/hour
+
+
 class AppConfig(BaseModel):
     persons: list[PersonConfig] = Field(default_factory=list)
     products: list[ProductConfig] = Field(default_factory=list)
@@ -99,6 +105,7 @@ class AppConfig(BaseModel):
     reddit: RedditConfig = Field(default_factory=RedditConfig)
     rss: RSSConfig = Field(default_factory=RSSConfig)
     news: NewsConfig = Field(default_factory=NewsConfig)
+    github: GitHubConfig = Field(default_factory=GitHubConfig)
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     email: EmailConfig = Field(default_factory=EmailConfig)
     web: WebConfig = Field(default_factory=WebConfig)

@@ -40,7 +40,7 @@ def init():
 
 
 @main.command()
-@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news"]),
+@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news", "github"]),
               help="Run only this collector")
 def collect(source):
     """Run data collectors."""
@@ -178,6 +178,7 @@ def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.youtube import YouTubeCollector
     from iu.collectors.reddit import RedditCollector
     from iu.collectors.news import NewsCollector
+    from iu.collectors.github import GitHubCollector
 
     mapping = {
         "rss": RSSCollector,
@@ -185,6 +186,7 @@ def _get_collector(source: str, config: AppConfig, conn):
         "youtube": YouTubeCollector,
         "reddit": RedditCollector,
         "news": NewsCollector,
+        "github": GitHubCollector,
     }
     return mapping[source](config, conn)
 
@@ -196,13 +198,14 @@ def _is_source_enabled(source: str, config: AppConfig) -> bool:
         "youtube": config.youtube.enabled,
         "reddit": config.reddit.enabled,
         "news": config.news.enabled,
+        "github": config.github.enabled,
     }
     return mapping.get(source, False)
 
 
 def _seed_entities(conn, config: AppConfig) -> None:
     for p in config.persons:
-        insert_person(conn, p.id, p.name, p.twitter, p.youtube_channel, p.reddit, p.tags)
+        insert_person(conn, p.id, p.name, p.twitter, p.youtube_channel, p.reddit, p.github, p.tags)
     for p in config.products:
         insert_product(conn, p.id, p.name, p.company, p.tags)
 
