@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS items (
     metadata        TEXT DEFAULT '{}',   -- JSON object
     person_id       TEXT REFERENCES persons(id),
     product_id      TEXT REFERENCES products(id),
+    importance      INTEGER DEFAULT 0,   -- 0-100 importance score
     content_hash    TEXT NOT NULL,
     UNIQUE(content_hash)
 );
@@ -68,6 +69,23 @@ CREATE TABLE IF NOT EXISTS reports (
     analysis_ids    TEXT DEFAULT '[]',   -- JSON array
     delivered_email INTEGER DEFAULT 0,
     delivered_at    TEXT
+);
+
+CREATE TABLE IF NOT EXISTS topics (
+    id          TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    summary     TEXT,
+    trend       TEXT,   -- "rising", "falling", "stable"
+    week_start  TEXT NOT NULL,
+    week_end    TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    item_count  INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS item_topics (
+    item_id     TEXT REFERENCES items(id) ON DELETE CASCADE,
+    topic_id    TEXT REFERENCES topics(id) ON DELETE CASCADE,
+    PRIMARY KEY (item_id, topic_id)
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(

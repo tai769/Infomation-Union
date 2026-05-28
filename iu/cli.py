@@ -172,6 +172,33 @@ def summarize(limit):
     conn.close()
 
 
+@main.command()
+def topics():
+    """Extract topics from this week's data."""
+    from iu.analysis.topics import extract_topics
+    import asyncio
+    from datetime import datetime, timedelta
+    config = load_config()
+
+    if not config.analysis.api_key:
+        click.echo("No API key configured. Set analysis.api_key in config.yaml")
+        sys.exit(1)
+
+    today = datetime.utcnow()
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=6)
+
+    conn = get_db()
+    init_db(conn)
+    result = asyncio.run(extract_topics(conn, config,
+                                         week_start.strftime("%Y-%m-%d"),
+                                         week_end.strftime("%Y-%m-%d")))
+    click.echo(f"Extracted {len(result)} topics.")
+    for t in result:
+        click.echo(f"  {t['name']} ({t['item_count']} items, {t['trend']})")
+    conn.close()
+
+
 def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.rss import RSSCollector
     from iu.collectors.twitter import TwitterCollector

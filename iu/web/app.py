@@ -13,7 +13,7 @@ from iu.config import load_config
 from iu.db import (
     get_db, init_db, get_recent_items, get_active_persons, get_active_products,
     get_items_by_person, get_items_by_product, search_items, get_item_count,
-    get_person_item_counts, get_latest_report,
+    get_person_item_counts, get_latest_report, get_topics, get_top_items, get_topic_items,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,14 +50,23 @@ def _get_conn():
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     conn = _get_conn()
-    items = get_recent_items(conn, 20)
     persons = get_person_item_counts(conn)
     total = get_item_count(conn)
     report = get_latest_report(conn)
+    top_items = get_top_items(conn, limit=10)
+    topics = get_topics(conn)
+
+    # Parse metadata for top items
+    for item in top_items:
+        item["metadata"] = json.loads(item.get("metadata", "{}") or "{}")
+
     conn.close()
     return templates.TemplateResponse(
         request=request, name="index.html",
-        context={"items": items, "persons": persons, "total": total, "report": report}
+        context={
+            "persons": persons, "total": total, "report": report,
+            "top_items": top_items, "topics": topics,
+        }
     )
 
 
@@ -146,6 +155,24 @@ async def product_detail(request: Request, product_id: str):
     return templates.TemplateResponse(
         request=request, name="product.html",
         context={"product": product, "items": items}
+    )
+
+
+@app.get("/topics", response_class=HTMLResponse)
+async def topics_page(request: Request):
+    conn = _get_conn()
+    topics = get_topics(conn)
+
+    # Get items for each topic
+    for topic in topics:
+        topic_items = get_topic_items(conn, topic["id"])
+        for item in topic_items:
+            item["metadata"] = json.loads(item.get("metadata", "{}") or "{}")
+        topic["items"] = topic_items
+
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="topics.html", context={"topics": topics}
     )
 
 

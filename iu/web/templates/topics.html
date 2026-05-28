@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Topics — Information Union{% endblock %}
+{% block content %}
+<h2 style="font-size: 18px; margin-bottom: 16px;">Topics This Week</h2>
+
+{% for topic in topics %}
+<div class="card" style="margin-bottom: 16px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <h3 style="margin: 0;">{{ topic.name }}</h3>
+        <span style="background: {% if topic.trend == 'rising' %}#e8f5e9{% elif topic.trend == 'falling' %}#fce4ec{% else %}#fff3e0{% endif %}; color: {% if topic.trend == 'rising' %}#2e7d32{% elif topic.trend == 'falling' %}#c62828{% else %}#e65100{% endif %}; padding: 2px 8px; border-radius: 4px; font-size: 12px;">{{ topic.trend }}</span>
+        <span style="color: #999; font-size: 12px;">{{ topic.item_count }} items</span>
+    </div>
+    <p style="color: #555; font-size: 14px; line-height: 1.5;">{{ topic.summary }}</p>
+
+    {% if topic["items"] %}
+    <div style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 12px;">
+        {% for item in topic["items"][:5] %}
+        <div style="padding: 6px 0; border-bottom: 1px solid #f5f5f5;">
+            <span class="badge badge-{{ item.source }}" style="font-size: 10px;">{{ item.source }}</span>
+            <a href="{{ item.source_url }}" target="_blank" style="font-size: 13px;">{{ item.title or '(no title)' }}</a>
+            <span style="float: right; font-size: 11px; color: #999;">{{ item.importance }}</span>
+        </div>
+        {% endfor %}
+        {% if topic["items"]|length > 5 %}
+        <div style="font-size: 12px; color: #999; padding-top: 6px;">+{{ topic["items"]|length - 5 }} more</div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<p style="color: #999;">No topics extracted yet. Run <code>iu topics</code> to extract topics from this week's data.</p>
+{% endfor %}
+{% endblock %}

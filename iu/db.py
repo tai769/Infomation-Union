@@ -184,3 +184,62 @@ def get_person_item_counts(conn: sqlite3.Connection) -> list[dict]:
         ORDER BY count DESC
     """).fetchall()
     return [dict(r) for r in rows]
+
+
+def update_item_importance(conn: sqlite3.Connection, item_id: str, importance: int) -> None:
+    conn.execute("UPDATE items SET importance = ? WHERE id = ?", (importance, item_id))
+
+
+def get_top_items(conn: sqlite3.Connection, limit: int = 10, week_start: str = "") -> list[dict]:
+    if week_start:
+        rows = conn.execute(
+            "SELECT * FROM items WHERE published_at >= ? ORDER BY importance DESC, published_at DESC LIMIT ?",
+            (week_start, limit)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM items ORDER BY importance DESC, published_at DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def insert_topic(conn: sqlite3.Connection, topic: dict) -> None:
+    conn.execute(
+        """INSERT INTO topics (id, name, summary, trend, week_start, week_end, created_at, item_count)
+           VALUES (?,?,?,?,?,?,?,?)""",
+        (topic["id"], topic["name"], topic.get("summary", ""),
+         topic.get("trend", ""), topic["week_start"], topic["week_end"],
+         topic["created_at"], topic.get("item_count", 0))
+    )
+    conn.commit()
+
+
+def link_item_topic(conn: sqlite3.Connection, item_id: str, topic_id: str) -> None:
+    conn.execute(
+        "INSERT OR IGNORE INTO item_topics (item_id, topic_id) VALUES (?,?)",
+        (item_id, topic_id)
+    )
+
+
+def get_topics(conn: sqlite3.Connection, week_start: str = "") -> list[dict]:
+    if week_start:
+        rows = conn.execute(
+            "SELECT * FROM topics WHERE week_start = ? ORDER BY item_count DESC",
+            (week_start,)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM topics ORDER BY created_at DESC, item_count DESC LIMIT 50"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_topic_items(conn: sqlite3.Connection, topic_id: str) -> list[dict]:
+    rows = conn.execute("""
+        SELECT i.* FROM items i
+        JOIN item_topics it ON i.id = it.item_id
+        WHERE it.topic_id = ?
+        ORDER BY i.importance DESC, i.published_at DESC
+    """, (topic_id,)).fetchall()
+    return [dict(r) for r in rows]
