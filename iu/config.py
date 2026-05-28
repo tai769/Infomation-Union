@@ -97,6 +97,17 @@ class GitHubConfig(BaseModel):
     token: str = ""  # Optional: increases rate limit from 60 to 5000 req/hour
 
 
+class NewsletterFeedConfig(BaseModel):
+    url: str
+    name: str = ""
+    author: str = ""
+
+
+class NewsletterConfig(BaseModel):
+    enabled: bool = True
+    feeds: list[NewsletterFeedConfig] = Field(default_factory=list)
+
+
 class AppConfig(BaseModel):
     persons: list[PersonConfig] = Field(default_factory=list)
     products: list[ProductConfig] = Field(default_factory=list)
@@ -106,6 +117,7 @@ class AppConfig(BaseModel):
     rss: RSSConfig = Field(default_factory=RSSConfig)
     news: NewsConfig = Field(default_factory=NewsConfig)
     github: GitHubConfig = Field(default_factory=GitHubConfig)
+    newsletter: NewsletterConfig = Field(default_factory=NewsletterConfig)
     analysis: AnalysisConfig = Field(default_factory=AnalysisConfig)
     email: EmailConfig = Field(default_factory=EmailConfig)
     web: WebConfig = Field(default_factory=WebConfig)

@@ -40,7 +40,7 @@ def init():
 
 
 @main.command()
-@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news", "github"]),
+@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news", "github", "trend", "newsletter"]),
               help="Run only this collector")
 def collect(source):
     """Run data collectors."""
@@ -179,6 +179,8 @@ def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.reddit import RedditCollector
     from iu.collectors.news import NewsCollector
     from iu.collectors.github import GitHubCollector
+    from iu.collectors.trends import TrendCollector
+    from iu.collectors.newsletter import NewsletterCollector
 
     mapping = {
         "rss": RSSCollector,
@@ -187,6 +189,8 @@ def _get_collector(source: str, config: AppConfig, conn):
         "reddit": RedditCollector,
         "news": NewsCollector,
         "github": GitHubCollector,
+        "trend": TrendCollector,
+        "newsletter": NewsletterCollector,
     }
     return mapping[source](config, conn)
 
@@ -199,6 +203,8 @@ def _is_source_enabled(source: str, config: AppConfig) -> bool:
         "reddit": config.reddit.enabled,
         "news": config.news.enabled,
         "github": config.github.enabled,
+        "trend": True,
+        "newsletter": True,
     }
     return mapping.get(source, False)
 
