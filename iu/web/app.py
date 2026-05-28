@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Query, Request
@@ -8,13 +9,30 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from iu.config import load_config
 from iu.db import (
     get_db, init_db, get_recent_items, get_active_persons, get_active_products,
     get_items_by_person, get_items_by_product, search_items, get_item_count,
     get_person_item_counts, get_latest_report,
 )
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Information Union", docs_url="/docs")
+
+# Start scheduler on app startup
+@app.on_event("startup")
+async def startup_event():
+    from iu.scheduler import start_scheduler
+    config = load_config()
+    app.state.scheduler = start_scheduler(config)
+    logger.info("Scheduler started with web server")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if hasattr(app.state, "scheduler"):
+        app.state.scheduler.shutdown()
+        logger.info("Scheduler stopped")
 
 STATIC_DIR = Path(__file__).parent / "static"
 TEMPLATES_DIR = Path(__file__).parent / "templates"
