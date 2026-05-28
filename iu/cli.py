@@ -40,7 +40,7 @@ def init():
 
 
 @main.command()
-@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news", "github", "trend", "newsletter"]),
+@click.option("--source", type=click.Choice(["rss", "twitter", "youtube", "reddit", "news", "github", "trend", "newsletter", "arxiv", "producthunt", "substack"]),
               help="Run only this collector")
 def collect(source):
     """Run data collectors."""
@@ -181,6 +181,9 @@ def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.github import GitHubCollector
     from iu.collectors.trends import TrendCollector
     from iu.collectors.newsletter import NewsletterCollector
+    from iu.collectors.arxiv import ArxivCollector
+    from iu.collectors.producthunt import ProductHuntCollector
+    from iu.collectors.substack import SubstackCollector
 
     mapping = {
         "rss": RSSCollector,
@@ -191,6 +194,9 @@ def _get_collector(source: str, config: AppConfig, conn):
         "github": GitHubCollector,
         "trend": TrendCollector,
         "newsletter": NewsletterCollector,
+        "arxiv": ArxivCollector,
+        "producthunt": ProductHuntCollector,
+        "substack": SubstackCollector,
     }
     return mapping[source](config, conn)
 
@@ -205,6 +211,9 @@ def _is_source_enabled(source: str, config: AppConfig) -> bool:
         "github": config.github.enabled,
         "trend": True,
         "newsletter": True,
+        "arxiv": True,
+        "producthunt": True,
+        "substack": True,
     }
     return mapping.get(source, False)
 

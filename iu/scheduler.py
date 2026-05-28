@@ -26,7 +26,7 @@ def run_weekly_pipeline(config: AppConfig):
     init_db(conn)
 
     # 1. Collect
-    sources = ["rss", "twitter", "youtube", "reddit", "news", "github", "trend", "newsletter"]
+    sources = ["rss", "twitter", "youtube", "reddit", "news", "github", "trend", "newsletter", "arxiv", "producthunt", "substack"]
     for source in sources:
         if _is_source_enabled(source, config):
             try:
@@ -102,7 +102,7 @@ def _daily_collect(config: AppConfig):
     conn = get_db()
     init_db(conn)
 
-    sources = ["rss", "youtube", "reddit", "news", "github", "newsletter"]
+    sources = ["rss", "youtube", "reddit", "news", "github", "newsletter", "arxiv", "producthunt", "substack"]
     total = 0
     for source in sources:
         if _is_source_enabled(source, config):
