@@ -67,6 +67,24 @@ Provide your analysis as JSON:
 }"""
 
 
+YOUTUBE_SUMMARIZE_PROMPT = """Summarize the following YouTube video transcript. Provide:
+
+1. **Title**: What the video is about (1 line)
+2. **Key Points**: 3-5 main takeaways (bullet points)
+3. **Notable Quotes**: Any memorable or significant quotes from the speaker
+4. **Relevance**: Why this matters for AI industry analysis
+
+Be concise but capture the essence. Focus on insights, opinions, and new information — not generic descriptions.
+
+Respond in JSON:
+{
+  "title": "descriptive title",
+  "key_points": ["point 1", "point 2", ...],
+  "notable_quotes": ["quote 1", ...],
+  "relevance": "why this matters"
+}"""
+
+
 EXPORT_TEMPLATE = """# AI Intelligence Export: Week of {{ week_start }} to {{ week_end }}
 
 Total items: {{ total }}

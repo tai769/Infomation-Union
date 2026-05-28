@@ -35,7 +35,25 @@
             <span class="badge badge-{{ item.source }}">{{ item.source }}</span>
             <a href="{{ item.source_url }}" target="_blank">{{ item.title or '(no title)' }}</a>
         </h3>
+        {% if item.metadata and item.metadata.summary %}
+        <div style="background: #f0f7ff; padding: 10px; border-radius: 6px; margin: 8px 0; font-size: 13px;">
+            <strong>AI Summary:</strong>
+            {% if item.metadata.summary.key_points %}
+            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                {% for point in item.metadata.summary.key_points[:3] %}
+                <li>{{ point }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.metadata.summary.notable_quotes %}
+            <p style="margin: 6px 0 0; font-style: italic; color: #555;">
+                "{{ item.metadata.summary.notable_quotes[0][:150] }}"
+            </p>
+            {% endif %}
+        </div>
+        {% else %}
         <p>{{ (item.content or '')[:300] }}{% if (item.content or '')|length > 300 %}...{% endif %}</p>
+        {% endif %}
         <div class="meta">
             <span>{{ item.author or 'Unknown' }}</span>
             <span>{{ item.published_at[:10] if item.published_at else '' }}</span>

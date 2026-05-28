@@ -137,7 +137,7 @@ def serve(port):
 
 @main.command()
 def analyze():
-    """Run AI analysis on collected data (requires Claude API key)."""
+    """Run AI analysis on collected data (requires API key)."""
     from iu.analysis.engine import run_analysis
     import asyncio
     config = load_config()
@@ -150,6 +150,25 @@ def analyze():
     conn = get_db()
     init_db(conn)
     asyncio.run(run_analysis(conn, config))
+    conn.close()
+
+
+@main.command()
+@click.option("--limit", default=20, help="Max videos to summarize")
+def summarize(limit):
+    """Summarize YouTube video transcripts."""
+    from iu.analysis.summarize import summarize_youtube
+    import asyncio
+    config = load_config()
+
+    if not config.analysis.api_key:
+        click.echo("No API key configured. Set analysis.api_key in config.yaml")
+        sys.exit(1)
+
+    conn = get_db()
+    init_db(conn)
+    count = asyncio.run(summarize_youtube(conn, config, limit))
+    click.echo(f"Summarized {count} videos.")
     conn.close()
 
 
