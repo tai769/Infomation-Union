@@ -149,6 +149,78 @@ async def product_detail(request: Request, product_id: str):
     )
 
 
+@app.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    config = load_config()
+    return templates.TemplateResponse(
+        request=request, name="settings.html",
+        context={"config": config}
+    )
+
+
+@app.post("/api/settings/email")
+async def update_email_settings(request: Request):
+    from iu.config import save_config
+    config = load_config()
+
+    data = await request.json()
+    config.email.enabled = data.get("enabled", False)
+    config.email.smtp_host = data.get("smtp_host", "")
+    config.email.smtp_port = int(data.get("smtp_port", 587))
+    config.email.smtp_user = data.get("smtp_user", "")
+    config.email.smtp_password = data.get("smtp_password", "")
+    config.email.from_addr = data.get("from_addr", "")
+    config.email.to_addrs = [a.strip() for a in data.get("to_addrs", []) if a.strip()]
+
+    save_config(config)
+    return {"status": "ok", "message": "Email settings saved"}
+
+
+@app.post("/api/settings/email/test")
+async def test_email(request: Request):
+    from iu.delivery.email_report import send_report
+    config = load_config()
+
+    if not config.email.enabled:
+        return {"status": "error", "message": "Email is not enabled"}
+
+    try:
+        conn = _get_conn()
+        await send_report(conn, config)
+        conn.close()
+        return {"status": "ok", "message": f"Test email sent to {config.email.to_addrs}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.post("/api/settings/email/add-recipient")
+async def add_recipient(request: Request):
+    from iu.config import save_config
+    config = load_config()
+
+    data = await request.json()
+    email = data.get("email", "").strip()
+    if email and email not in config.email.to_addrs:
+        config.email.to_addrs.append(email)
+        save_config(config)
+
+    return {"status": "ok", "recipients": config.email.to_addrs}
+
+
+@app.post("/api/settings/email/remove-recipient")
+async def remove_recipient(request: Request):
+    from iu.config import save_config
+    config = load_config()
+
+    data = await request.json()
+    email = data.get("email", "").strip()
+    if email in config.email.to_addrs:
+        config.email.to_addrs.remove(email)
+        save_config(config)
+
+    return {"status": "ok", "recipients": config.email.to_addrs}
+
+
 @app.get("/api/items")
 async def api_items(
     person: str = "",

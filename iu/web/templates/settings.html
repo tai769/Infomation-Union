@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Settings — Information Union{% endblock %}
+{% block content %}
+<h2 style="font-size: 18px; margin-bottom: 24px;">Settings</h2>
+
+<div class="card" style="max-width: 700px;">
+    <h3>Email Configuration</h3>
+    <form id="email-form" style="margin-top: 16px;">
+        <div style="margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="email-enabled" {% if config.email.enabled %}checked{% endif %}>
+                <span>Enable email reports</span>
+            </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+                <label style="font-size: 13px; color: #666; display: block; margin-bottom: 4px;">SMTP Host</label>
+                <input type="text" id="smtp-host" value="{{ config.email.smtp_host }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+            <div>
+                <label style="font-size: 13px; color: #666; display: block; margin-bottom: 4px;">SMTP Port</label>
+                <input type="number" id="smtp-port" value="{{ config.email.smtp_port }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+                <label style="font-size: 13px; color: #666; display: block; margin-bottom: 4px;">SMTP User</label>
+                <input type="text" id="smtp-user" value="{{ config.email.smtp_user }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+            <div>
+                <label style="font-size: 13px; color: #666; display: block; margin-bottom: 4px;">SMTP Password</label>
+                <input type="password" id="smtp-password" value="{{ config.email.smtp_password }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; color: #666; display: block; margin-bottom: 4px;">From Address</label>
+            <input type="email" id="from-addr" value="{{ config.email.from_addr }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; color: #666; display: block; margin-bottom: 8px;">Recipients</label>
+            <div id="recipients-list" style="margin-bottom: 8px;">
+                {% for addr in config.email.to_addrs %}
+                <div class="recipient-item" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 6px 10px; background: #f5f5f5; border-radius: 6px;">
+                    <span style="flex: 1;">{{ addr }}</span>
+                    <button onclick="removeRecipient('{{ addr }}')" style="background: #ff4444; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 12px;">Remove</button>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <input type="email" id="new-recipient" placeholder="Add email address..." style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                <button onclick="addRecipient()" style="padding: 8px 16px; background: #1a1a2e; color: white; border: none; border-radius: 6px; cursor: pointer;">Add</button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            <button type="button" onclick="saveEmailSettings()" style="padding: 10px 24px; background: #1a1a2e; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Save Settings</button>
+            <button type="button" onclick="testEmail()" style="padding: 10px 24px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Send Test Email</button>
+        </div>
+    </form>
+    <div id="email-status" style="margin-top: 12px; font-size: 13px;"></div>
+</div>
+
+<script>
+async function saveEmailSettings() {
+    const data = {
+        enabled: document.getElementById('email-enabled').checked,
+        smtp_host: document.getElementById('smtp-host').value,
+        smtp_port: document.getElementById('smtp-port').value,
+        smtp_user: document.getElementById('smtp-user').value,
+        smtp_password: document.getElementById('smtp-password').value,
+        from_addr: document.getElementById('from-addr').value,
+        to_addrs: Array.from(document.querySelectorAll('.recipient-item span')).map(el => el.textContent.trim()),
+    };
+
+    const resp = await fetch('/api/settings/email', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+    });
+    const result = await resp.json();
+    showStatus(result.status, result.message);
+}
+
+async function testEmail() {
+    showStatus('info', 'Sending test email...');
+    const resp = await fetch('/api/settings/email/test', {method: 'POST'});
+    const result = await resp.json();
+    showStatus(result.status, result.message);
+}
+
+async function addRecipient() {
+    const input = document.getElementById('new-recipient');
+    const email = input.value.trim();
+    if (!email) return;
+
+    const resp = await fetch('/api/settings/email/add-recipient', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email}),
+    });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+        input.value = '';
+        location.reload();
+    }
+}
+
+async function removeRecipient(email) {
+    const resp = await fetch('/api/settings/email/remove-recipient', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email}),
+    });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+        location.reload();
+    }
+}
+
+function showStatus(type, message) {
+    const el = document.getElementById('email-status');
+    const color = type === 'ok' ? '#4caf50' : type === 'error' ? '#ff4444' : '#2196f3';
+    el.innerHTML = `<span style="color: ${color};">${message}</span>`;
+}
+</script>
+{% endblock %}
