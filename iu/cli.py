@@ -199,6 +199,48 @@ def topics():
     conn.close()
 
 
+@main.command()
+def dedup():
+    """Find and merge duplicate items from multiple sources."""
+    from iu.analysis.dedup import deduplicate_items
+    conn = get_db()
+    init_db(conn)
+    count = deduplicate_items(conn)
+    click.echo(f"Merged {count} duplicate groups.")
+    conn.close()
+
+
+@main.command()
+@click.option("--limit", default=10, help="Max items to analyze")
+def impact(limit):
+    """Analyze industry chain impact for top items."""
+    from iu.analysis.impact import analyze_week_impacts
+    import asyncio
+    config = load_config()
+
+    if not config.analysis.api_key:
+        click.echo("No API key configured.")
+        sys.exit(1)
+
+    conn = get_db()
+    init_db(conn)
+    results = asyncio.run(analyze_week_impacts(conn, config, limit))
+    click.echo(f"Analyzed {len(results)} items.")
+    conn.close()
+
+
+@main.command()
+def init_companies():
+    """Initialize company database."""
+    from iu.db_companies import init_company_tables, seed_companies
+    conn = get_db()
+    init_db(conn)
+    init_company_tables(conn)
+    seed_companies(conn)
+    click.echo("Company database initialized.")
+    conn.close()
+
+
 def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.rss import RSSCollector
     from iu.collectors.twitter import TwitterCollector
