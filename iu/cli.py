@@ -241,6 +241,37 @@ def init_companies():
     conn.close()
 
 
+@main.command()
+def init_signals():
+    """Initialize signal chain and tracking tables."""
+    from iu.db_signals import init_signal_tables
+    conn = get_db()
+    init_db(conn)
+    init_signal_tables(conn)
+    click.echo("Signal tables initialized.")
+    conn.close()
+
+
+@main.command()
+def advanced():
+    """Run advanced analysis: signal chains, company tracking, heatmap, viewpoints, competitive comparison."""
+    from iu.analysis.advanced import run_advanced_analysis
+    import asyncio
+    config = load_config()
+
+    if not config.analysis.api_key:
+        click.echo("No API key configured.")
+        sys.exit(1)
+
+    conn = get_db()
+    init_db(conn)
+    results = asyncio.run(run_advanced_analysis(conn, config))
+    click.echo("Advanced analysis complete:")
+    for k, v in results.items():
+        click.echo(f"  {k}: {v}")
+    conn.close()
+
+
 def _get_collector(source: str, config: AppConfig, conn):
     from iu.collectors.rss import RSSCollector
     from iu.collectors.twitter import TwitterCollector
